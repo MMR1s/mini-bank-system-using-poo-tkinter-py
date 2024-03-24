@@ -14,7 +14,30 @@ app.geometry("600x500")
 
 data = []
 userInfo = []
-# ________________________________________________________
+
+
+# Exception handling for file opening
+def fichierOpener():
+    try:
+        with open("loadData.csv", "r") as fichier:
+            ouvrire = csv.reader(fichier, delimiter=";")
+            for ligne in ouvrire:
+                userInfo.append(ligne)
+    except FileNotFoundError:
+        print("File not found!")
+    except Exception as e:
+        print("An error occurred while opening the file:", e)
+
+
+# Exception handling for file writing
+def fichierloading(data):
+    try:
+        with open("loadData.csv", "w") as fichier:
+            ecrire = csv.writer(fichier, delimiter=";")
+            for row in data:
+                ecrire.writerow(row)
+    except Exception as e:
+        print("An error occurred while writing to the file:", e)
 
 
 def ChangeTypeCompte():
@@ -25,56 +48,58 @@ def ChangeTypeCompte():
         mdE.config(state=tk.DISABLED)
         tiE.config(state=tk.NORMAL)
 
+
 def AjouterUnCompte():
-    numero = Compte.numeroDeCompte
-    proprietaire = ProE.get()
-    soldeInitial = solE.get()
-    type = v.get()
-    tauxInteret = tiE.get()
-    MontantDecouvert = mdE.get()
-    if type == "courant":
-        compteCourant = CompteCourant(
-            numero, proprietaire, soldeInitial, current_date, MontantDecouvert
-        )
-        tauxInteret = 0
-        data.append(
-            [numero, proprietaire, soldeInitial, type, tauxInteret, MontantDecouvert]
-        )
-        print(compteCourant)
-    else:
-        compteEpargne = CompteEpargne(
-            numero, proprietaire, soldeInitial, current_date, tauxInteret
-        )
-        MontantDecouvert = 0
-        data.append(
-            [numero, proprietaire, soldeInitial, type, tauxInteret, MontantDecouvert]
-        )
-        print(compteEpargne)
+    try:
+        numero = Compte.numeroDeCompte
+        proprietaire = ProE.get()
+        soldeInitial = solE.get()
+        type = v.get()
+        tauxInteret = tiE.get()
+        MontantDecouvert = mdE.get()
+        if type == "courant":
+            compteCourant = CompteCourant(
+                numero, proprietaire, soldeInitial, current_date, MontantDecouvert
+            )
+            tauxInteret = 0
+            data.append(
+                [
+                    numero,
+                    proprietaire,
+                    soldeInitial,
+                    type,
+                    tauxInteret,
+                    MontantDecouvert,
+                ]
+            )
+            print(compteCourant)
+        else:
+            compteEpargne = CompteEpargne(
+                numero, proprietaire, soldeInitial, current_date, tauxInteret
+            )
+            MontantDecouvert = 0
+            data.append(
+                [
+                    numero,
+                    proprietaire,
+                    soldeInitial,
+                    type,
+                    tauxInteret,
+                    MontantDecouvert,
+                ]
+            )
+            print(compteEpargne)
 
-    fichierloading(data)
+        fichierloading(data)
 
-    for item in tableau.get_children():
-        tableau.delete(item)
+        for item in tableau.get_children():
+            tableau.delete(item)
 
-    for row in data:
-        tableau.insert("", "end", values=row)
-
-
-def fichierloading(data):
-    with open("loadData.csv", "w") as fichier:
-        ecrire = csv.writer(fichier, delimiter=";")
         for row in data:
-            ecrire.writerow(row)
+            tableau.insert("", "end", values=row)
+    except Exception as e:
+        print("An error occurred while adding a new account:", e)
 
-
-def fichierOpener():
-    with open("loadData.csv", "r") as fichier:
-        ouvrire = csv.reader(fichier, delimiter=";")
-        for ligne in ouvrire:
-            userInfo.append(ligne)
-
-
-# ________________________________________________
 
 NumeroL = tk.Label(app, text="Numero:")
 NumeroL.grid(column=0, row=0)
